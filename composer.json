@@ -15,7 +15,9 @@
         "symfony/flex": "^2",
         "symfony/framework-bundle": "6.3.*",
         "symfony/runtime": "6.3.*",
-        "symfony/yaml": "6.3.*"
+        "symfony/twig-bundle": "6.3.*",
+        "symfony/yaml": "6.3.*",
+        "twig/twig": "^3.7"
     },
     "config": {
         "allow-plugins": {
@@ -65,5 +67,8 @@
             "require": "6.3.*",
             "docker": true
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.4"
     }
 }
