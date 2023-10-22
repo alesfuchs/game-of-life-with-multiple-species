@@ -100,7 +100,7 @@ class Matrix
         $this->cells[$this->getCellIndexFromCoordinates($cell->getCoordinates())] = $cell;
     }
 
-    public function printForDebugWithCurrentBreed(): string
+    public function debugDataWithCurrentBreed(): string
     {
         $output = "\ncurrent breeds";
 
@@ -119,7 +119,7 @@ class Matrix
         return $output;
     }
 
-    public function printForDebugWithFuturePossibleBreeds(): string
+    public function debugDataWithFuturePossibleBreeds(): string
     {
         $output = "\nfuture possible breeds";
 

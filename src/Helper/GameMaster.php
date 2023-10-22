@@ -2,7 +2,7 @@
 
 namespace App\Helper;
 
-use App\Exceptions\InvalidIterationsException;
+use App\Exceptions\InvalidIterationsCountException;
 use App\Exceptions\InvalidMatrixSizeException;
 use App\ValueObject\Matrix;
 use App\ValueObject\MatrixCell;
@@ -16,20 +16,30 @@ class GameMaster
     public static function runGame(
         Matrix $matrix,
         int $iterationsCount,
+        bool $debug = false,
     ): void
     {
-        if ($iterationsCount <= 0) {
-            InvalidIterationsException::notPositive($iterationsCount);
+        if ($iterationsCount < 0) {
+            InvalidIterationsCountException::negative($iterationsCount);
         }
 
-        echo $matrix->printForDebugWithFuturePossibleBreeds()."\n";
+        if ($debug) {
+            echo $matrix->debugDataWithFuturePossibleBreeds()."\n";
+        }
 
         self::selectWinningBreedsForNextIteration($matrix);
 
         for ($i=0; $i<$iterationsCount; $i++) {
-            echo $matrix->printForDebugWithCurrentBreed()."\n";
+            if ($debug) {
+                echo $matrix->debugDataWithCurrentBreed() . "\n";
+            }
+
             self::gatherFuturePossibleBreeds($matrix);
-            echo $matrix->printForDebugWithFuturePossibleBreeds()."\n";
+
+            if ($debug) {
+                echo $matrix->debugDataWithFuturePossibleBreeds() . "\n";
+            }
+
             self::selectWinningBreedsForNextIteration($matrix);
         }
 

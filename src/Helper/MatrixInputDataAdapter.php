@@ -6,6 +6,7 @@ use App\Exceptions\CannotAddCellToMatrixException;
 use App\Exceptions\CannotAddSurroundingCellToMatrixCellException;
 use App\Exceptions\CannotGetCellFromMatrixException;
 use App\Exceptions\CannotGetSurroundingCoordinatesListException;
+use App\Exceptions\GameCannotContinueException;
 use App\Exceptions\InvalidCoordinatesException;
 use App\Exceptions\InvalidInputDataException;
 use App\Exceptions\InvalidMatrixSizeException;
@@ -13,17 +14,19 @@ use App\Exceptions\MatrixCellIndexException;
 use App\ValueObject\Matrix;
 use App\ValueObject\MatrixCell;
 use App\ValueObject\MatrixCoordinates;
+use App\ValueObject\ParsedGameAssignment;
 use LogicException;
 
-class MatrixInputDataParser
+class MatrixInputDataAdapter
 {
 
     /**
      * @throws InvalidInputDataException
      * @throws MatrixCellIndexException
      * @throws CannotGetCellFromMatrixException
+     * @throws GameCannotContinueException
      */
-    public static function parseData(array $data): Matrix
+    public static function parseDataIntoMatrix(array $data): ParsedGameAssignment
     {
         $matrixSize = $data['dimension'] ?? null;
         $breedsCount = $data['speciesCount'] ?? null;
@@ -59,8 +62,12 @@ class MatrixInputDataParser
             throw InvalidInputDataException::create('Organisms must be provided.');
         }
 
-        if (!is_array($organisms) || count($organisms) === 0) {
-            throw InvalidInputDataException::create('Organisms must be non-empty array.');
+        if (!is_array($organisms)) {
+            throw InvalidInputDataException::create('Organisms must be array.');
+        }
+
+        if (count($organisms) === 0) {
+            throw GameCannotContinueException::emptyMatrix();
         }
 
         try {
@@ -104,7 +111,30 @@ class MatrixInputDataParser
             $matrix->getCell($coordinates)->addFuturePossibleBreed($breed);
         }
 
-        return $matrix;
+        return new ParsedGameAssignment($matrix, $maxIterationsCount);
     }
 
+    public static function getDataFromMatrix(ParsedGameAssignment $parsedGameAssignment): array
+    {
+        $nonEmptyCellsData = [];
+
+        foreach ($parsedGameAssignment->matrix->getCells() as $cell) {
+            if ($cell->getCurrentBreed() === null) {
+                continue;
+            }
+
+            $nonEmptyCellsData[] = [
+                'x_pos' => $cell->getCoordinates()->coordinateX,
+                'y_pos' => $cell->getCoordinates()->coordinateY,
+                'species' => $cell->getCurrentBreed(),
+            ];
+        }
+
+        return [
+            'dimension' => $parsedGameAssignment->matrix->getSize(),
+            'speciesCount' => 1, // TODO consider dropping this field
+            'iterationsCount' => $parsedGameAssignment->maxIterationsCount,
+            'organisms' => $nonEmptyCellsData,
+        ];
+    }
 }

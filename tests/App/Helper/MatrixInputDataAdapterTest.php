@@ -5,11 +5,11 @@ namespace App\Helper;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
-class MatrixInputDataParserTest extends TestCase
+class MatrixInputDataAdapterTest extends TestCase
 {
 
     // TODO add fail tests
-    public function testParseDataSuccess(): void
+    public function testParseDataIntoMatrixSuccess(): void
     {
         $data = [
             'dimension' => 3,
@@ -44,13 +44,13 @@ class MatrixInputDataParserTest extends TestCase
             ],
         ];
 
-        $matrix = MatrixInputDataParser::parseData($data);
+        $matrix = MatrixInputDataAdapter::parseDataIntoMatrix($data)->matrix;
 
         self::assertSame("\n"
             ."[1,1]-blue-red [2,1]- [3,1]- \n"
             ."[1,2]- [2,2]-blue [3,2]- \n"
             ."[1,3]- [2,3]- [3,3]-red-green ",
-            $matrix->printForDebugWithFuturePossibleBreeds(),
+            $matrix->debugDataWithFuturePossibleBreeds(),
         );
     }
 
