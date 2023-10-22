@@ -37,6 +37,9 @@ class MatrixCell
         return $this->coordinates;
     }
 
+    /**
+     * @return list<MatrixCell>
+     */
     public function getSurroundingCells(): array
     {
         return $this->surroundingCells;
@@ -83,6 +86,9 @@ class MatrixCell
         $this->currentBreed = $currentBreed;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getFuturePossibleBreeds(): array
     {
         return $this->futurePossibleBreeds;

@@ -2,7 +2,9 @@
 
 namespace App\ValueObject;
 
+use App\Exceptions\CannotGetSurroundingCoordinatesListException;
 use App\Exceptions\InvalidCoordinatesException;
+use App\Exceptions\InvalidMatrixSizeException;
 use JetBrains\PhpStorm\Immutable;
 
 #[Immutable]
@@ -40,6 +42,42 @@ class MatrixCoordinates
             abs($this->coordinateX - $coordinates->coordinateX),
             abs($this->coordinateY - $coordinates->coordinateY)
         );
+    }
+
+    /**
+     * @return list<self>
+     * @throws InvalidMatrixSizeException
+     * @throws CannotGetSurroundingCoordinatesListException
+     */
+    public function getSurroundingCoordinatesList(int $matrixSize): array
+    {
+        if ($matrixSize <= 0) {
+            throw InvalidMatrixSizeException::notPositive($matrixSize);
+        }
+
+        if ($matrixSize < $this->coordinateX || $matrixSize < $this->coordinateY) {
+            throw CannotGetSurroundingCoordinatesListException::matrixSizeTooSmall($this, $matrixSize);
+        }
+
+        $minCoordinateX = max(1, $this->coordinateX - 1);
+        $maxCoordinateX = min($matrixSize, $this->coordinateX + 1);
+
+        $minCoordinateY = max(1, $this->coordinateY - 1);
+        $maxCoordinateY = min($matrixSize, $this->coordinateY + 1);
+
+        $surroundingCoordinatesList = [];
+
+        foreach (range($minCoordinateY, $maxCoordinateY) as $coordinateY) {
+            foreach (range($minCoordinateX, $maxCoordinateX) as $coordinateX) {
+                $coordinates = new self($coordinateX, $coordinateY);
+
+                if (!$coordinates->equalsTo($this)) {
+                    $surroundingCoordinatesList[] = $coordinates;
+                }
+            }
+        }
+
+        return $surroundingCoordinatesList;
     }
 
     public function __toString(): string

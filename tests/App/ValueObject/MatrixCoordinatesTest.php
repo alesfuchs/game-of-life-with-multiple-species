@@ -2,9 +2,12 @@
 
 namespace App\ValueObject;
 
+use App\Exceptions\CannotGetSurroundingCoordinatesListException;
 use App\Exceptions\InvalidCoordinatesException;
+use App\Exceptions\InvalidMatrixSizeException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 class MatrixCoordinatesTest extends TestCase
 {
@@ -98,4 +101,131 @@ class MatrixCoordinatesTest extends TestCase
         ];
     }
 
+    /**
+     * @param list<MatrixCoordinates> $expectedResult
+     */
+    #[DataProvider('getSurroundingCoordinatesListSuccessDataProvider')]
+    public function testGetSurroundingCoordinatesListSuccess(
+        MatrixCoordinates $coordinates,
+        int $matrixSize,
+        array $expectedResult,
+    ): void
+    {
+        $surroundingCoordinatesList = $coordinates->getSurroundingCoordinatesList($matrixSize);
+
+        self::assertCount(count($expectedResult), $surroundingCoordinatesList);
+
+        foreach ($surroundingCoordinatesList as $key => $surroundingCoordinates) {
+            self::assertTrue($surroundingCoordinates->equalsTo($expectedResult[$key]));
+        }
+    }
+
+    /**
+     * @return array<string, array{coordinates: MatrixCoordinates, matrixSize: int, expectedResult: list<MatrixCoordinates>}>
+     */
+    public static function getSurroundingCoordinatesListSuccessDataProvider(): array
+    {
+        return [
+            'middle' => [
+                'coordinates' => new MatrixCoordinates(5, 5),
+                'matrixSize' => 10,
+                'expectedResult' => [
+                    new MatrixCoordinates(4, 4),
+                    new MatrixCoordinates(5, 4),
+                    new MatrixCoordinates(6, 4),
+                    new MatrixCoordinates(4, 5),
+                    new MatrixCoordinates(6, 5),
+                    new MatrixCoordinates(4, 6),
+                    new MatrixCoordinates(5, 6),
+                    new MatrixCoordinates(6, 6),
+                ]
+            ],
+            'left_top' => [
+                'coordinates' => new MatrixCoordinates(1, 1),
+                'matrixSize' => 10,
+                'expectedResult' => [
+                    new MatrixCoordinates(2, 1),
+                    new MatrixCoordinates(1, 2),
+                    new MatrixCoordinates(2, 2),
+                ]
+            ],
+            'middle_top' => [
+                'coordinates' => new MatrixCoordinates(5, 1),
+                'matrixSize' => 10,
+                'expectedResult' => [
+                    new MatrixCoordinates(4, 1),
+                    new MatrixCoordinates(6, 1),
+                    new MatrixCoordinates(4, 2),
+                    new MatrixCoordinates(5, 2),
+                    new MatrixCoordinates(6, 2),
+                ]
+            ],
+            'right_top' => [
+                'coordinates' => new MatrixCoordinates(5, 1),
+                'matrixSize' => 5,
+                'expectedResult' => [
+                    new MatrixCoordinates(4, 1),
+                    new MatrixCoordinates(4, 2),
+                    new MatrixCoordinates(5, 2),
+                ]
+            ],
+            'left_bottom' => [
+                'coordinates' => new MatrixCoordinates(1, 5),
+                'matrixSize' => 5,
+                'expectedResult' => [
+                    new MatrixCoordinates(1, 4),
+                    new MatrixCoordinates(2, 4),
+                    new MatrixCoordinates(2, 5),
+                ]
+            ],
+            'right_bottom' => [
+                'coordinates' => new MatrixCoordinates(5, 5),
+                'matrixSize' => 5,
+                'expectedResult' => [
+                    new MatrixCoordinates(4, 4),
+                    new MatrixCoordinates(5, 4),
+                    new MatrixCoordinates(4, 5),
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @param class-string<Throwable> $exceptionClass
+     */
+    #[DataProvider('getSurroundingCoordinatesListFailDataProvider')]
+    public function testGetSurroundingCoordinatesListFail(
+        MatrixCoordinates $coordinates,
+        int $matrixSize,
+        string $exceptionClass,
+        string $exceptionMessage,
+    ): void
+    {
+        $this->expectException($exceptionClass);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $coordinates->getSurroundingCoordinatesList($matrixSize);
+    }
+
+    /**
+     * @return array<string, array{coordinates: MatrixCoordinates, matrixSize: int, exceptionClass: class-string<Throwable>, exceptionMessage: string}>
+     */
+    public static function getSurroundingCoordinatesListFailDataProvider(): array
+    {
+        return [
+            'outOfScope' => [
+                'coordinates' => new MatrixCoordinates(5, 5),
+                'matrixSize' => 0,
+                'exceptionClass' => InvalidMatrixSizeException::class,
+                'exceptionMessage' => 'Matrix size must be a positive integer, 0 provided.',
+            ],
+            'coordinatesNotOccupied' => [
+                'coordinates' => new MatrixCoordinates(5, 5),
+                'matrixSize' => 3,
+                'exceptionClass' => CannotGetSurroundingCoordinatesListException::class,
+                'exceptionMessage' => 'Cannot get surrounding coordinates of [5,5] for Matrix size 3 because it\'s too small.',
+            ],
+        ];
+
+    }
 }
