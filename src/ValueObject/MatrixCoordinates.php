@@ -2,10 +2,14 @@
 
 namespace App\ValueObject;
 
+use JetBrains\PhpStorm\Immutable;
 use App\Exceptions\CannotGetSurroundingCoordinatesListException;
 use App\Exceptions\InvalidCoordinatesException;
 use App\Exceptions\InvalidMatrixSizeException;
-use JetBrains\PhpStorm\Immutable;
+use function abs;
+use function max;
+use function min;
+use function range;
 
 #[Immutable]
 class MatrixCoordinates
@@ -31,21 +35,22 @@ class MatrixCoordinates
         $this->coordinateY = $coordinateY;
     }
 
-    public function equalsTo(MatrixCoordinates $coordinates): bool
+    public function equalsTo(self $coordinates): bool
     {
         return $this->getMaxCoordinateDistanceFromCoordinates($coordinates) === 0;
     }
 
-    public function getMaxCoordinateDistanceFromCoordinates(MatrixCoordinates $coordinates): int
+    public function getMaxCoordinateDistanceFromCoordinates(self $coordinates): int
     {
         return max(
             abs($this->coordinateX - $coordinates->coordinateX),
-            abs($this->coordinateY - $coordinates->coordinateY)
+            abs($this->coordinateY - $coordinates->coordinateY),
         );
     }
 
     /**
      * @return list<self>
+     *
      * @throws InvalidMatrixSizeException
      * @throws CannotGetSurroundingCoordinatesListException
      */

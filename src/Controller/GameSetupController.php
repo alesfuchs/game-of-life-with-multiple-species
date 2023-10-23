@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Exceptions\CannotGetCellFromMatrixException;
 use App\Exceptions\GameCannotContinueException;
 use App\Exceptions\InvalidInputDataException;
-use App\Exceptions\InvalidMatrixSizeException;
+use App\Exceptions\InvalidIterationsCountException;
 use App\Exceptions\MatrixCellIndexException;
 use App\Form\GameAssignmentType;
 use App\Helper\GameMaster;
@@ -73,7 +73,7 @@ final class GameSetupController extends AbstractController
 
         try {
             GameMaster::runGame($parsedGameAssignment->matrix, $iterationsToBeProcessed);
-        } catch (InvalidMatrixSizeException $e) {
+        } catch (InvalidIterationsCountException $e) {
             throw new LogicException($e->getMessage(), 0, $e);
         }
 

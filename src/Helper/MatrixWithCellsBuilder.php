@@ -2,7 +2,7 @@
 
 namespace App\Helper;
 
-use App\Exceptions\CannotAddCellToMatrixException;
+use LogicException;
 use App\Exceptions\CannotAddSurroundingCellToMatrixCellException;
 use App\Exceptions\CannotGetCellFromMatrixException;
 use App\Exceptions\CannotGetSurroundingCoordinatesListException;
@@ -12,7 +12,7 @@ use App\Exceptions\MatrixCellIndexException;
 use App\ValueObject\Matrix;
 use App\ValueObject\MatrixCell;
 use App\ValueObject\MatrixCoordinates;
-use LogicException;
+use function range;
 
 class MatrixWithCellsBuilder
 {

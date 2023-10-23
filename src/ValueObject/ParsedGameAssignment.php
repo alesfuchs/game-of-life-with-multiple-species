@@ -2,6 +2,9 @@
 
 namespace App\ValueObject;
 
+use JetBrains\PhpStorm\Immutable;
+
+#[Immutable]
 class ParsedGameAssignment
 {
 

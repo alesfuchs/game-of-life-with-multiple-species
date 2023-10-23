@@ -9,7 +9,7 @@ class GameCannotContinueException extends RuntimeException
 
     public static function emptyMatrix(): self
     {
-        return new self("The Matrix is completely dead.");
+        return new self('The Matrix is completely dead.');
     }
 
 }

@@ -2,15 +2,15 @@
 
 namespace App\Exceptions;
 
-use App\ValueObject\MatrixCoordinates;
 use RuntimeException;
+use App\ValueObject\MatrixCoordinates;
 
 class MatrixCellIndexException extends RuntimeException
 {
 
     public static function outOfScope(
         int $size,
-        MatrixCoordinates $coordinates
+        MatrixCoordinates $coordinates,
     ): self
     {
         return new self("Matrix cell index cannot be resolved. The coordinates {$coordinates} are out of matrix scope {$size}.");

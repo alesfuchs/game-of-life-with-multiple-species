@@ -2,9 +2,8 @@
 
 namespace App\Exceptions;
 
-use App\ValueObject\MatrixCell;
-use App\ValueObject\MatrixCoordinates;
 use RuntimeException;
+use App\ValueObject\MatrixCoordinates;
 
 class CannotGetCellFromMatrixException extends RuntimeException
 {

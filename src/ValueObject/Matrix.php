@@ -6,19 +6,21 @@ use App\Exceptions\CannotAddCellToMatrixException;
 use App\Exceptions\CannotGetCellFromMatrixException;
 use App\Exceptions\InvalidMatrixSizeException;
 use App\Exceptions\MatrixCellIndexException;
+use function array_key_exists;
+use function implode;
+use function ksort;
 
 class Matrix
 {
+
     private int $size;
 
     /**
-     * @var array{int, MatrixCell}
+     * @var array<int, MatrixCell>
      */
     private array $cells;
 
     /**
-     * @param int $size
-     * @param array{int, MatrixCell} $cells
      * @throws InvalidMatrixSizeException
      */
     public function __construct(
@@ -43,7 +45,7 @@ class Matrix
      */
     public function getCellIndexFromCoordinates(MatrixCoordinates $coordinates): int
     {
-        if ($coordinates->coordinateX > $this->size || $coordinates->coordinateY > $this->size ) {
+        if ($coordinates->coordinateX > $this->size || $coordinates->coordinateY > $this->size) {
             throw MatrixCellIndexException::outOfScope($this->size, $coordinates);
         }
 
@@ -87,7 +89,6 @@ class Matrix
     }
 
     /**
-     * @param array $cells
      * @throws MatrixCellIndexException
      * @throws CannotAddCellToMatrixException
      */

@@ -2,8 +2,8 @@
 
 namespace App\Exceptions;
 
-use App\ValueObject\MatrixCell;
 use RuntimeException;
+use App\ValueObject\MatrixCell;
 
 class CannotAddSurroundingCellToMatrixCellException extends RuntimeException
 {

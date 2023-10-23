@@ -3,15 +3,17 @@
 namespace App\Helper;
 
 use App\Exceptions\InvalidIterationsCountException;
-use App\Exceptions\InvalidMatrixSizeException;
 use App\ValueObject\Matrix;
 use App\ValueObject\MatrixCell;
+use function array_key_exists;
+use function array_rand;
+use function count;
 
 class GameMaster
 {
 
     /**
-     * @throws InvalidMatrixSizeException
+     * @throws InvalidIterationsCountException
      */
     public static function runGame(
         Matrix $matrix,
@@ -20,16 +22,16 @@ class GameMaster
     ): void
     {
         if ($iterationsCount < 0) {
-            InvalidIterationsCountException::negative($iterationsCount);
+            throw InvalidIterationsCountException::negative($iterationsCount);
         }
 
         if ($debug) {
-            echo $matrix->debugDataWithFuturePossibleBreeds()."\n";
+            echo $matrix->debugDataWithFuturePossibleBreeds() . "\n";
         }
 
         self::selectWinningBreedsForNextIteration($matrix);
 
-        for ($i=0; $i<$iterationsCount; $i++) {
+        for ($i = 0; $i < $iterationsCount; $i++) {
             if ($debug) {
                 echo $matrix->debugDataWithCurrentBreed() . "\n";
             }
@@ -71,8 +73,8 @@ class GameMaster
     {
         $countsOfBreeds = [];
 
-        foreach ($cell->getSurroundingCells() as $cell) {
-            $breed = $cell->getCurrentBreed();
+        foreach ($cell->getSurroundingCells() as $surroundingCell) {
+            $breed = $surroundingCell->getCurrentBreed();
 
             if ($breed === null) {
                 continue;

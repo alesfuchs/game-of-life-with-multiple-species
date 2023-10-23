@@ -2,26 +2,27 @@
 
 namespace App\Helper;
 
-use App\Exceptions\CannotAddCellToMatrixException;
-use App\Exceptions\CannotAddSurroundingCellToMatrixCellException;
+use LogicException;
 use App\Exceptions\CannotGetCellFromMatrixException;
-use App\Exceptions\CannotGetSurroundingCoordinatesListException;
 use App\Exceptions\GameCannotContinueException;
-use App\Exceptions\InvalidCoordinatesException;
 use App\Exceptions\InvalidInputDataException;
 use App\Exceptions\InvalidMatrixSizeException;
 use App\Exceptions\MatrixCellIndexException;
-use App\ValueObject\Matrix;
-use App\ValueObject\MatrixCell;
 use App\ValueObject\MatrixCoordinates;
 use App\ValueObject\ParsedGameAssignment;
-use LogicException;
+use function count;
+use function is_array;
+use function is_int;
+use function is_string;
+use function strlen;
+use function trim;
 
 class MatrixInputDataAdapter
 {
 
     /**
-     * @param mixed[]|null
+     * @param mixed[]|null $data
+     *
      * @throws InvalidInputDataException
      * @throws MatrixCellIndexException
      * @throws CannotGetCellFromMatrixException
@@ -106,19 +107,21 @@ class MatrixInputDataAdapter
                 throw InvalidInputDataException::create("Species must be provided for organism #{$key}");
             }
 
-            $breed = trim($breed);
-            if (!is_string($breed) || strlen($breed) === 0) {
+            if (!is_string($breed) || strlen(trim($breed)) === 0) {
                 throw InvalidInputDataException::create("Species must be non-empty string for organism #{$key}");
             }
 
             $coordinates = new MatrixCoordinates($coordinateX, $coordinateY);
 
-            $matrix->getCell($coordinates)->addFuturePossibleBreed($breed);
+            $matrix->getCell($coordinates)->addFuturePossibleBreed(trim($breed));
         }
 
         return new ParsedGameAssignment($matrix, $maxIterationsCount);
     }
 
+    /**
+     * @return mixed[]
+     */
     public static function getDataFromMatrix(ParsedGameAssignment $parsedGameAssignment): array
     {
         $nonEmptyCellsData = [];
@@ -142,4 +145,5 @@ class MatrixInputDataAdapter
             'organisms' => $nonEmptyCellsData,
         ];
     }
+
 }

@@ -3,6 +3,7 @@
 namespace App\ValueObject;
 
 use App\Exceptions\CannotAddSurroundingCellToMatrixCellException;
+use function in_array;
 
 class MatrixCell
 {
@@ -45,7 +46,7 @@ class MatrixCell
         return $this->surroundingCells;
     }
 
-    public function containsSurroundingCell(MatrixCell $cell): bool
+    public function containsSurroundingCell(self $cell): bool
     {
         foreach ($this->surroundingCells as $surroundingCell) {
             if ($surroundingCell->getCoordinates()->equalsTo($cell->getCoordinates())) {
@@ -59,7 +60,7 @@ class MatrixCell
     /**
      * @throws CannotAddSurroundingCellToMatrixCellException
      */
-    public function addSurroundingCell(MatrixCell $cell): void
+    public function addSurroundingCell(self $cell): void
     {
         if ($this->coordinates->equalsTo($cell->getCoordinates())) {
             throw CannotAddSurroundingCellToMatrixCellException::addingSelf($cell);
