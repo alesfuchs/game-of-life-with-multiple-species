@@ -1,0 +1,25 @@
+{# templates/_matrix.twig #}
+
+
+{% if matrix is defined and matrix is not null %}
+    <h2>Current matrix content</h2>
+
+    <div class="container">
+        <div class="row">
+        {% for key, cell in matrix.getCells() %}
+            {% if ( key % matrix.getSize() ) == 0  %}
+                </div>
+                <div class="row">
+            {% endif %}
+            <div class="col border">
+                {{ cell.getCurrentBreed() ?? '&nbsp;' }}
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+
+    <h2>Matrix JSON representation</h2>
+    <textarea class="w-100">
+        {{ matrixJsonData }}
+    </textarea>
+{% endif %}
