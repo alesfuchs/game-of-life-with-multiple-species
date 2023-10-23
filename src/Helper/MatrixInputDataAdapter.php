@@ -21,13 +21,18 @@ class MatrixInputDataAdapter
 {
 
     /**
+     * @param mixed[]|null
      * @throws InvalidInputDataException
      * @throws MatrixCellIndexException
      * @throws CannotGetCellFromMatrixException
      * @throws GameCannotContinueException
      */
-    public static function parseDataIntoMatrix(array $data): ParsedGameAssignment
+    public static function parseDataIntoMatrix(?array $data): ParsedGameAssignment
     {
+        if ($data === null) {
+            throw InvalidInputDataException::create('Invalid data format provided.');
+        }
+
         $matrixSize = $data['dimension'] ?? null;
         $breedsCount = $data['speciesCount'] ?? null;
         $maxIterationsCount = $data['iterationsCount'] ?? null;

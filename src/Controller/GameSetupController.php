@@ -23,12 +23,13 @@ final class GameSetupController extends AbstractController
     #[Route('/', name: 'game_of_life_post', methods: ['POST'])]
     public function search(Request $request): Response
     {
+        // TODO cleanup the whole method
         $form = $this->createForm(GameAssignmentType::class);
 
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
-            return $this->render('game_setup.html', [
+            return $this->render('game_setup.html.twig', [
                 'form' => $form,
             ]);
         }
@@ -44,9 +45,12 @@ final class GameSetupController extends AbstractController
         try {
             $parsedGameAssignment = MatrixInputDataAdapter::parseDataIntoMatrix(json_decode($jsonDataToBeParsed, true));
         } catch (GameCannotContinueException $e) {
-            return $this->render('game_over.html', [
+            $this->addFlash('error', $e->getMessage());
+
+            return $this->render('game_over.html.twig', [
                 'totalProcessedIterations' => $currentIterationNumber ?? 0,
                 'matrix' => null,
+                'matrixJsonData' => null,
             ]);
         } catch (
             InvalidInputDataException |
@@ -55,7 +59,7 @@ final class GameSetupController extends AbstractController
         ) {
             $this->addFlash('error', $e->getMessage());
 
-            return $this->render('game_setup.html', [
+            return $this->render('game_setup.html.twig', [
                 'form' => $form,
             ]);
         }
@@ -82,25 +86,28 @@ final class GameSetupController extends AbstractController
                 : "{$totalProcessedIterations} iterations processed.",
         );
 
+        $matrixJsonData = json_encode(MatrixInputDataAdapter::getDataFromMatrix($parsedGameAssignment));
+
         $form = $this->createForm(GameAssignmentType::class, array_merge(
             $formData,
             [
                 'currentIterationNumber' => $totalProcessedIterations,
-                'currentIterationData' => json_encode(MatrixInputDataAdapter::getDataFromMatrix($parsedGameAssignment)),
+                'currentIterationData' => $matrixJsonData,
             ]
         ));
 
-
         if ($totalProcessedIterations >= $parsedGameAssignment->maxIterationsCount) {
-            return $this->render('game_over.html', [
+            return $this->render('game_over.html.twig', [
                 'totalProcessedIterations' => $totalProcessedIterations,
                 'matrix' => $parsedGameAssignment->matrix,
+                'matrixJsonData' => $matrixJsonData,
             ]);
         }
 
-        return $this->render('game_running.html', [
+        return $this->render('game_running.html.twig', [
             'form' => $form,
             'matrix' => $parsedGameAssignment->matrix,
+            'matrixJsonData' => $matrixJsonData,
         ]);
     }
 }

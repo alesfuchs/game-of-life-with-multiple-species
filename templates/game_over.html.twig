@@ -1,0 +1,7 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>Game over</h1>
+
+{{ include('_matrix.html.twig', { 'matrix': matrix, 'matrixJsonData': matrixJsonData }) }}
+{% endblock %}
